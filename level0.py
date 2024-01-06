@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import networkx as nx
 import numpy as np
+import json
 
 
 dataset = r"Mock-Hackathon\Input data\level0.json"
@@ -23,17 +24,18 @@ for index, row in restaurants_df.iterrows():
     restaurant_distances.extend(row['restaurants']['neighbourhood_distance'])
 
 
-names = ['n' + str(i) for i in range(len(neighbours))]
+
 
 #--------------------------------------------------------------------------------------------
 
 
 G = nx.Graph()
-restaurant_node = 'restaurant'
+restaurant_node = 'r0'
 G.add_node(restaurant_node)
+names = ['n' + str(i) for i in range(len(neighbours))]
 
 num_houses = len(neighbours)
-G.add_nodes_from(range(num_houses))
+G.add_nodes_from(names)
 
 # Connect the restaurant node to all neighborhood house nodes
 for i in range(num_houses):
@@ -88,10 +90,24 @@ total_cost_greedy_tsp = sum(G_reordered[greedy_tsp_path[i]][greedy_tsp_path[i + 
 print(total_cost_greedy_tsp)
 
 print("Christofides")
-greedy_tsp_path = nx.approximation.christofides(G, weight='weight', tree=None)
+greedy_tsp_path = nx.approximation.christofides(G_reordered, weight='weight', tree=None)
 total_cost_greedy_tsp = sum(G_reordered[greedy_tsp_path[i]][greedy_tsp_path[i + 1]]['weight'] for i in range(len(greedy_tsp_path) - 1))
 print(total_cost_greedy_tsp)
 
 
 print("Minimum cost: ",total_cost)
 print("Optimal path",tsp_path)
+
+
+out = [tsp_path[0]]
+for i in tsp_path[1:-1]:
+    if(type(i) != 'str'):
+        out.append("n"+str(i))
+out.append(tsp_path[-1])
+
+output_file_path = "level0_output.json"
+output_data = {
+    "v0": {"path": out}
+}
+with open(output_file_path, 'w') as json_file:
+    json.dump(output_data, json_file)

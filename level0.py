@@ -100,7 +100,34 @@ print(total_cost_greedy_tsp)
 
 
 
+#---------------------------------------------------------------------------------------------------------------
+#Output file
+visual()
 
+def total_cost(graph, path):
+    return sum(graph[path[i]][path[i + 1]]['weight'] for i in range(len(path) - 1))
+
+def two_opt(graph, path):
+    improved = True
+    while improved:
+        improved = False
+        for i in range(1, len(path) - 2):
+            for j in range(i + 1, len(path)):
+                if j - i == 1:
+                    continue # Changes nothing, skip then
+                new_path = path[:i] + path[i:j][::-1] + path[j:]
+                if total_cost(graph, new_path) < total_cost(graph, path):
+                    path = new_path
+                    improved = True
+        return path
+
+# Assuming tsp_path is the initial solution obtained
+improved_path = two_opt(G_reordered, tsp_path)
+
+print("Improved TSP Path:", improved_path)
+print("Improved Total Cost:", total_cost(G_reordered, improved_path))
+
+tsp_path = improved_path
 
 out = [tsp_path[0]]
 for i in tsp_path[1:-1]:
@@ -114,7 +141,3 @@ output_data = {
 }
 with open(output_file_path, 'w') as json_file:
     json.dump(output_data, json_file)
-
-print("Minimum cost: ",total_cost)
-print("Optimal path",out)
-visual()

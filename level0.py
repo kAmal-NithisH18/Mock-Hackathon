@@ -1,6 +1,8 @@
 #"Level 0"
+import matplotlib.pyplot as plt
 import pandas as pd
 import networkx as nx
+import numpy as np
 
 
 dataset = r"Mock-Hackathon\Input data\level0.json"
@@ -20,51 +22,76 @@ for index, row in neighbourhoods_df.iterrows():
 for index, row in restaurants_df.iterrows():
     restaurant_distances.extend(row['restaurants']['neighbourhood_distance'])
 
-#naming for mapping it into list
+
 names = ['n' + str(i) for i in range(len(neighbours))]
 
-G = nx.Graph()
-num_houses = len(neighbours)
-G.add_nodes_from(range(num_houses))
+#--------------------------------------------------------------------------------------------
 
+
+G = nx.Graph()
 restaurant_node = 'restaurant'
 G.add_node(restaurant_node)
 
+num_houses = len(neighbours)
+G.add_nodes_from(range(num_houses))
 
 # Connect the restaurant node to all neighborhood house nodes
 for i in range(num_houses):
     G.add_edge(restaurant_node, i, weight=restaurant_distances[i])
 
+# Connect houses with correct weights
 for i in range(num_houses):
     for j in range(i + 1, num_houses):
         G.add_edge(i, j, weight=neighbours[i][j])
 
 start_node = restaurant_node
-
-# Manually reorder nodes based on the start node
-nodes_ordered = [start_node] + [node for node in G.nodes if node != start_node]
+nodes_ordered = [start_node]+[node for node in G.nodes if node != start_node] 
 print(nodes_ordered)
-subgraph = G.subgraph(nodes_ordered)
 
-
-tsp_path = nx.approximation.traveling_salesman_problem(subgraph, weight='weight')
+nodes_ordered = list(nx.dfs_preorder_nodes(G, source=start_node))
+G_reordered = G.subgraph(nodes_ordered)
+tsp_path = nx.approximation.traveling_salesman_problem(G_reordered)
 
 
 print("TSP Path:", tsp_path)
+total_cost = sum(G[tsp_path[i]][tsp_path[i + 1]]['weight'] for i in range(len(tsp_path) - 1))
+print("Total Cost:", total_cost)
 
-import matplotlib.pyplot as plt
+def visual():
+    subgraph = G.subgraph([restaurant_node] + list(G.neighbors(restaurant_node)))
+    pos = nx.spring_layout(subgraph)  
+    nx.draw(subgraph, pos, with_labels=True, font_weight='bold')
+    labels = nx.get_edge_attributes(subgraph, 'weight')
+    nx.draw_networkx_edge_labels(subgraph, pos, edge_labels=labels)
+    edges = [(tsp_path[i], tsp_path[i + 1]) for i in range(len(tsp_path) - 1)]
+    plt.show()
 
-subgraph = G.subgraph([restaurant_node] + list(G.neighbors(restaurant_node)))
-pos = nx.spring_layout(subgraph)  
-nx.draw(subgraph, pos, with_labels=True, font_weight='bold')
-labels = nx.get_edge_attributes(subgraph, 'weight')
-nx.draw_networkx_edge_labels(subgraph, pos, edge_labels=labels)
-plt.show()
+    nx.draw_networkx_edges(G_reordered, pos, edgelist=edges, edge_color='r', width=2)
+    plt.show()
 
-print()
+    subgraph = G.subgraph([restaurant_node] + list(G.neighbors(restaurant_node)))
+    pos = nx.spring_layout(subgraph)  
+    nx.draw(subgraph, pos, with_labels=True, font_weight='bold')
+    labels = nx.get_edge_attributes(subgraph, 'weight')
+    nx.draw_networkx_edge_labels(subgraph, pos, edge_labels=labels)
+    edges = [(tsp_path[i], tsp_path[i + 1]) for i in range(len(tsp_path) - 1)]
+    nx.draw_networkx_edges(G_reordered, pos, edgelist=edges, edge_color='r', width=2)
+    plt.show()
 
 
 
+print("Greedy")
+greedy_tsp_path = nx.approximation.greedy_tsp(G_reordered, weight='weight', source=start_node)
+# Calculate total cost
+print(greedy_tsp_path)
+total_cost_greedy_tsp = sum(G_reordered[greedy_tsp_path[i]][greedy_tsp_path[i + 1]]['weight'] for i in range(len(greedy_tsp_path) - 1))
+print(total_cost_greedy_tsp)
+
+print("Christofides")
+greedy_tsp_path = nx.approximation.christofides(G, weight='weight', tree=None)
+total_cost_greedy_tsp = sum(G_reordered[greedy_tsp_path[i]][greedy_tsp_path[i + 1]]['weight'] for i in range(len(greedy_tsp_path) - 1))
+print(total_cost_greedy_tsp)
 
 
-
+print("Minimum cost: ",total_cost)
+print("Optimal path",tsp_path)

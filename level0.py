@@ -124,10 +124,66 @@ def two_opt(graph, path):
 # Assuming tsp_path is the initial solution obtained
 improved_path = two_opt(G_reordered, tsp_path)
 
-print("Improved TSP Path:", improved_path)
+print("Improved TSP Path 2-opt:", improved_path)
 print("Improved Total Cost:", total_cost(G_reordered, improved_path))
 
-tsp_path = improved_path
+
+def threeopt():
+    def three_opt_swap(path, i, j, k):
+        part1 = path[:i]
+        part2 = path[i:j]
+        part3 = path[j:k]
+        part4 = path[k:]
+
+        new_path = part1 + part3 + part2[::-1] + part4
+
+        return new_path
+
+    def three_opt(graph, path):
+        improved = True
+        while improved:
+            improved = False
+            for i in range(1, len(path) - 4):
+                for j in range(i + 2, len(path) - 2):
+                    for k in range(j + 2, len(path)):
+                        new_path = three_opt_swap(path, i, j, k)
+                        if total_cost(graph, new_path) < total_cost(graph, path):
+                            path = new_path
+                            improved = True
+        return path
+
+    # Assuming tsp_path is the initial solution obtained
+    improved_path_3opt = three_opt(G_reordered, tsp_path)
+
+    print("Improved TSP Path (3-opt):", improved_path_3opt)
+    print("Improved Total Cost (3-opt):", total_cost(G_reordered, improved_path_3opt))
+    return improved_path_3opt
+
+def lin_kerin():
+    def lin_kernighan(graph, path):
+        improved = True
+        while improved:
+            improved = False
+            for i in range(1, len(path) - 1):
+                for j in range(i + 1, len(path)):
+                    new_path = k_opt_swap(graph, path, i, j)
+                    if total_cost(graph, new_path) < total_cost(graph, path):
+                        path = new_path
+                        improved = True
+        return path
+
+    def k_opt_swap(graph, path, i, j):
+        # Perform k-opt move, in this case, using 2-opt
+        return path[:i] + path[i:j][::-1] + path[j:]
+
+    # Assuming tsp_path is the initial solution obtained
+    improved_path_lin_kernighan = lin_kernighan(G_reordered, tsp_path)
+
+    print("Improved TSP Path (Lin-Kernighan):", improved_path_lin_kernighan)
+    print("Improved Total Cost (Lin-Kernighan):", total_cost(G_reordered, improved_path_lin_kernighan))
+    return improved_path_lin_kernighan
+
+tsp_path = threeopt()
 
 out = [tsp_path[0]]
 for i in tsp_path[1:-1]:

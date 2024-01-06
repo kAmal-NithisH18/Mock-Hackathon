@@ -15,14 +15,18 @@ vechiles_df = pd.DataFrame(data['vehicles'])
 
 neighbourhoods_df.dropna(inplace=True)
 restaurants_df.dropna(inplace=True)
+vechiles_df.dropna(inplace=True)
 
 neighbours = []
 restaurant_distances = []
+vechile_capacity = 0
 
 for index, row in neighbourhoods_df.iterrows():
     neighbours.append(row['neighbourhoods']['distances'])
 for index, row in restaurants_df.iterrows():
     restaurant_distances.extend(row['restaurants']['neighbourhood_distance'])
+for index, row in vechiles_df.iterrows():
+    vechile_capacity = row['vehicles']['capacity']
 
 def opt_path():
     G = nx.Graph()
@@ -44,18 +48,21 @@ def opt_path():
 
     start_node = restaurant_node
     nodes_ordered = [start_node]+[node for node in G.nodes if node != start_node] 
-    print(nodes_ordered)
+    
 
     nodes_ordered = list(nx.dfs_preorder_nodes(G, source=start_node))
     G_reordered = G.subgraph(nodes_ordered)
     tsp_path = nx.approximation.traveling_salesman_problem(G_reordered)
 
 
-    print("TSP Path:", tsp_path)
+    #print("TSP Path:", tsp_path)
     total_cost = sum(G[tsp_path[i]][tsp_path[i + 1]]['weight'] for i in range(len(tsp_path) - 1))
     print("Total Cost:", total_cost)
 
     return tsp_path
 #--------------------------------------------------------------------------------------------------------------
 
-print(opt_path())
+tsp_path = opt_path()
+print(tsp_path)
+
+

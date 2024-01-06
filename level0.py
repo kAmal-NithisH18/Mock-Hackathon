@@ -66,9 +66,11 @@ def visual():
     labels = nx.get_edge_attributes(subgraph, 'weight')
     nx.draw_networkx_edge_labels(subgraph, pos, edge_labels=labels)
     edges = [(tsp_path[i], tsp_path[i + 1]) for i in range(len(tsp_path) - 1)]
+    plt.savefig("fig1.png")
     plt.show()
 
     nx.draw_networkx_edges(G_reordered, pos, edgelist=edges, edge_color='r', width=2)
+    plt.savefig("fig2.png")
     plt.show()
 
     subgraph = G.subgraph([restaurant_node] + list(G.neighbors(restaurant_node)))
@@ -78,6 +80,7 @@ def visual():
     nx.draw_networkx_edge_labels(subgraph, pos, edge_labels=labels)
     edges = [(tsp_path[i], tsp_path[i + 1]) for i in range(len(tsp_path) - 1)]
     nx.draw_networkx_edges(G_reordered, pos, edgelist=edges, edge_color='r', width=2)
+    plt.savefig("fig3.png")
     plt.show()
 
 

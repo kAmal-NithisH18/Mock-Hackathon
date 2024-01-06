@@ -82,6 +82,7 @@ def visual():
 
 
 
+
 print("Greedy")
 greedy_tsp_path = nx.approximation.greedy_tsp(G_reordered, weight='weight', source=start_node)
 # Calculate total cost
@@ -95,8 +96,7 @@ total_cost_greedy_tsp = sum(G_reordered[greedy_tsp_path[i]][greedy_tsp_path[i + 
 print(total_cost_greedy_tsp)
 
 
-print("Minimum cost: ",total_cost)
-print("Optimal path",tsp_path)
+
 
 
 out = [tsp_path[0]]
@@ -111,3 +111,7 @@ output_data = {
 }
 with open(output_file_path, 'w') as json_file:
     json.dump(output_data, json_file)
+
+print("Minimum cost: ",total_cost)
+print("Optimal path",out)
+visual()

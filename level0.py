@@ -48,7 +48,7 @@ for i in range(num_houses):
 
 start_node = restaurant_node
 nodes_ordered = [start_node]+[node for node in G.nodes if node != start_node] 
-print(nodes_ordered)
+#print(nodes_ordered)
 
 nodes_ordered = list(nx.dfs_preorder_nodes(G, source=start_node))
 G_reordered = G.subgraph(nodes_ordered)
@@ -66,11 +66,11 @@ def visual():
     labels = nx.get_edge_attributes(subgraph, 'weight')
     nx.draw_networkx_edge_labels(subgraph, pos, edge_labels=labels)
     edges = [(tsp_path[i], tsp_path[i + 1]) for i in range(len(tsp_path) - 1)]
-    plt.savefig("fig1.png")
+    #plt.savefig("fig1.png")
     plt.show()
 
     nx.draw_networkx_edges(G_reordered, pos, edgelist=edges, edge_color='r', width=2)
-    plt.savefig("fig2.png")
+    #plt.savefig("fig2.png")
     plt.show()
 
     subgraph = G.subgraph([restaurant_node] + list(G.neighbors(restaurant_node)))
@@ -80,23 +80,23 @@ def visual():
     nx.draw_networkx_edge_labels(subgraph, pos, edge_labels=labels)
     edges = [(tsp_path[i], tsp_path[i + 1]) for i in range(len(tsp_path) - 1)]
     nx.draw_networkx_edges(G_reordered, pos, edgelist=edges, edge_color='r', width=2)
-    plt.savefig("fig3.png")
+    #plt.savefig("fig3.png")
     plt.show()
 
 
 
 
-print("Greedy")
+
 greedy_tsp_path = nx.approximation.greedy_tsp(G_reordered, weight='weight', source=start_node)
 # Calculate total cost
-print(greedy_tsp_path)
+#print(greedy_tsp_path)
 total_cost_greedy_tsp = sum(G_reordered[greedy_tsp_path[i]][greedy_tsp_path[i + 1]]['weight'] for i in range(len(greedy_tsp_path) - 1))
-print(total_cost_greedy_tsp)
 
-print("Christofides")
+
+#print("Christofides")
 greedy_tsp_path = nx.approximation.christofides(G_reordered, weight='weight', tree=None)
 total_cost_greedy_tsp = sum(G_reordered[greedy_tsp_path[i]][greedy_tsp_path[i + 1]]['weight'] for i in range(len(greedy_tsp_path) - 1))
-print(total_cost_greedy_tsp)
+
 
 
 
